@@ -154,6 +154,10 @@ $msg = '<div class="alert alert-success">SCORED SUCCESSFULY</div>';
             
            echo ' </table>';     
             }else{
+                //checking assesment status
+      $status = $handle->fetch("select * from set_ass where section='$sec' ");
+
+      if($status['status'] == '1'){
                 ?>
             <form method="post"> 
         <table class="table table-sm table-bordered" width="100%">
@@ -193,8 +197,10 @@ $msg = '<div class="alert alert-success">SCORED SUCCESSFULY</div>';
                 }
                 echo '</table>
             <button type="submit" class="btn btn-danger" name="send">Submit</button>';
+            }else{
+                echo '<div class="alert alert-danger">Assesment Submittion is Closed for the Term</div>';
             }
-            
+            }
             ?>
        
         </form>

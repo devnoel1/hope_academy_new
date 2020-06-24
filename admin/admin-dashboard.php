@@ -155,7 +155,7 @@
           <li <?php if(isset($_GET['ass_set'])) echo 'class="active"' ?>>
               <a class="text-white" href="admin-dashboard.php?ass_set">
               <i class="nc-icon nc-diamond text-white"></i>
-              <p>Set Assesment Period</p>
+              <p>Assesment</p>
             </a>
           </li>
         </ul>
@@ -1643,88 +1643,90 @@
           
           
           <?php
+          //working on assesment status
            }else if(isset($_GET['ass_set'])){
              ?>
             <h5>Assesment Record</h5>
-            <a href="#" class="btn btn-success btn-sm">Open</a>
-            <a href="#" class="btn btn-danger btn-sm">Close</a> 
-            <div class="card">
-              <div class="card-hearder">
-                <ul class="nav nav-tabs shadow pt-3">
-                  <li class="nav-item"><a href="#addc" data-toggle="tab" class="nav-link">Set Assesment Date</a></li>
-                  <li class="nav-item"><a href="#view" data-toggle="tab" class="nav-link">Assesment Date</a></li>
-                </ul>
-              </div>
-              <div class="card-body">
-                 <div class="tab-content">
-                   <div class="tab-pane" id="addc">
-                   <h6>Set Assesment Date</h6>
-                      <form action="" method="post">
-                        <div class="form-group">
-                          <label for="">Session</label>
-                          <select name="ses_id" id="" class="form-control">
-                            <option value="" >select session</option>
-                            <?php
-                            $ses = $handle->fetchQuery('select * from act_session ');
-                            foreach($ses as $session){
-                            ?>
-                            <option value="<?=$session['ses_id'];?>'"><?=$session['ses_name'];?></option>
-                            <?php
-                            }
-                            ?>
-                          </select>
-                        </div>
-                        <div class="form-group">
-                          <label for="">Term</label>
-                          <select name="term" id="" class="form-control">
-                            <option value="" >select session</option>
-                            <?php
-                              $term = $handle->fetchQuery('select * from term');
-                              foreach($term as $tm):
-                            ?>
-                            <option value="<?=$tm['term_id'];?>"><?=$tm['term_name'];?></option>
-                            <?php
-                            endforeach
-                            ?>
-                          </select>
-                        </div>
-                        <div class="form-group">
-                          <label for="">Start Date</label>
-                          <input type="date" name="startdate" id="" class="form-control">
-                        </div>
-                        <div class="form-group">
-                          <label for="">End Date</label>
-                          <input type="date" name="enddate" id="" class="form-control">
-                        </div>
-                        <div class="form-group">
-                          <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                      </form>
-                   </div>
-                   <div class="tab-pane" id="view">
-                        <table class="table table-bordered">
+            <a href="process.php?set_ass&openass&sectn=<?=$sec;?>" class="btn btn-success btn-sm">Open</a>
+            <a href="process.php?set_ass&clossass&sectn=<?=$sec;?>" class="btn btn-danger btn-sm">Close</a> 
+            <?php
+                        if(isset($_GET['msg'])){
+                          echo $_GET['msg'];
+
+                          echo "<meta http-equiv=\"refresh\"content=\"4;url=admin-dashboard.php?ass_set\">";
+                        }
+
+                        //getting current session calender
+                        $calender = $handle->fetch("select *,acc_session.ses_id,term.term_id from act_cal
+                        join acc_session on act_cal.ses_id = acc_session.ses_id
+                        join term on act_cal.term_id = term.term_id
+                          where status= '1' and section ='$sec' ");
+
+                        //checking assesment status
+                        $status = $handle->fetch("select * from set_ass where section='$sec' ");
+
+                        $state = "";
+
+                        if($status['status'] == '1')
+                        {
+                          $state = '<span class="text-success">OPEN</span>';
+                        }
+                        else
+                        {
+                          $state = '<span class="text-warning">CLOSSED</span>';
+                        }
+                      ?>
+                      <h6>Session: <span><?=$calender['ses_name'];?></span></h6>
+                      <h6>Term: <span><?=$calender['term_name'];?></span></h6>
+                      <h6>Status: <?=$state;?></h6>
+
+                      <table class="table table-bordered table-sm" width="60%">
                           <tr>
-                            <th>Sn</th>
-                            <th>Session</th>
-                            <th>Term</th>
-                            <th>Start Date</th>
-                            <th>Dead Line</th>
-                            <th>Status</th>
+                            <th colspan="4">Submitted Assesment For The Term </th>
                           </tr>
                           <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <th width="20">Sn</th>
+                            <th>Subject</th>
+                            <th>Class</th>
+                            <th width="20">Status</th>
                           </tr>
-                        </table>
-                   </div>
-                 </div>
-              </div>
-            </div>
+                          <?php
+                          //getting subject the school offer with their classes
+                          $result = $handle->fetchQuery("select *,subject.sub_id,sub_comb.sub_id,class.cls_id from sub_comb
+                        right  join subject on sub_comb.sub_id = subject.sub_id
+                        right  join class on sub_comb.cls_id = class.cls_id where sub_comb.section ='$sec' ");
+
+                          $sno=1;
+                          for($i=0; isset($result[$i]); $i++){
+                            
+                            $cls_id = $result[$i]['cls_id'];
+                            //checking if subject have been submitted
+                            $check = $handle->numRows("select * from accesed where section='$sec' and cls_id='$cls_id' and ses_id = '".$calender['ses_id']."' and term_id = '".$calender['term_id']."' ");
+
+                          ?>
+                          <tr>
+                            <td><?=$sno++;?></td>
+                            <td class="text-capitalize"><?=$result[$i]['sub_name'];?></td>
+                            <td class="text-uppercase"><?=$result[$i]['cls_name'];?></td>
+                            <td>
+                              <?php
+                              //checking if staff have submitted assesment for the term in session
+                              if ($check > 0) {
+                                echo '<button disabled class="btn btn-success btn-sm btn-round"><i class="fa fa-check "></i> done</button>';
+                              }else{
+                                echo '<button disabled class="btn btn-sm btn-danger btn-round">pending</button>';
+                              }
+                              ?> 
+                            </td>
+                          </tr>
+                          <?php
+                        }
+                          ?>
+                      </table>
+
+            
              <?php
+             // include "set_assesment.php";
            }
           ?>            
   </div>

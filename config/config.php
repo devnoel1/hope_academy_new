@@ -35,13 +35,14 @@ class config {
 		$result = mysqli_query($this->conn,$query) or die("Error:".mysqli_error($this->conn));
                 
                 $available = mysqli_num_rows($result);
-           if($available>0){
+           if($available > 0){
+               
 		while($row=mysqli_fetch_assoc($result)) {
 			$resultset[] = $row;
-		}		
-		if(!empty($resultset))
-			return $resultset;
-            }
+            }	
+                return $resultset;
+    	    }
+		
         }
         
         //login page
@@ -101,8 +102,8 @@ class config {
                  $result = mysqli_query($this->conn, $query) or die("Error:".mysqli_error($this->conn));
                  
                  $row = mysqli_num_rows($result);
-                 if($rows > 0){
-                     while($view = mysqli_fetch_arry($result)){
+                 if($row > 0){
+                     while($view = mysqli_fetch_array($result)){
                          $resultset []=$view;
                      }
                          if(!empty($resultset)):

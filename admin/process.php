@@ -573,9 +573,8 @@ $handle->query("update reg_no_count set cont='$number' where id = '1' ") or die(
                     foreach ($_POST['subject'] as $id) {					
 					
 					//registring subjects
-                        $insert = $handle->query("insert into sub_reg(std_id,cls_id,sub_id,section) "
-                                . "values('$std_id','$cls','$id','$sec')") or die('not worked: ' . mysql_error($handle->conn));
-                           
+    $insert = $handle->query("insert into sub_reg(std_id,cls_id,sub_id,section) 
+        values('$std_id','$cls','$id','$sec')");   
                         }
                          $msg = '<div class="alert alert-success">registration was successfull</div>';
                    header("location:staff-dashboard.php?std&single_std=$std_id&msg=$msg");
@@ -647,8 +646,34 @@ $handle->query("update reg_no_count set cont='$number' where id = '1' ") or die(
     
     $handle->query("update cut_off set cut_of = '$cut_of' where id ='".$_GET['cut_off_edit']."'");
      header("location:admin-dashboard.php?cut_off");
+
 }else if(isset($_GET['set_ass'])){
-    
+
+    // $sesid = $_POST['ses'];
+    // $term = $_POST['term'];
+    // $startdate = $_POST['startdate'];
+    // $deadline = $_POST['enddate'];
+
+    // $handle->query("insert into set_ass (term_id,ses) 
+    // values('$term', '$sesid')");
+
+    // $msg = '<div class="alert alert-success">Assesment deadline have been placed successfuly!</div>';
+
+    // header("location: admin-dashboard.php?ass_set&msg=$msg");
+
+  if(isset($_GET['openass']))
+  {
+    $handle->query("update set_ass set status = '1' where section='$sec'");
+    $msg = '<div class="alert alert-success">Assesment is opened successfuly!</div>';
+  }
+  else if(isset($_GET['clossass']))
+  {
+    $handle->query("update set_ass set status = '0' where section='$sec'");
+    $msg = '<div class="alert alert-danger">Assesment is closed successfuly!</div>';
+  }
+
+  header("location: admin-dashboard.php?ass_set&msg=$msg");
+
 }
       
 

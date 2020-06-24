@@ -263,6 +263,31 @@ $class = $cl['cls_id'];
                           <span data-notify="message">Registration is Closed!</span>
                         </div>';
           }
+
+           //checking assesment status
+      $status = $handle->fetch("select * from set_ass where section='$sec' ");
+
+
+      if($status['status'] == '1')
+      {
+        echo '<div class="alert alert-success alert-with-icon alert-dismissible fade show" data-notify="container">
+                          <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+                            <i class="nc-icon nc-simple-remove"></i>
+                          </button>
+                          <span data-notify="icon" class="nc-icon nc-bell-55"></span>
+                          <span data-notify="message">Assignment Compilation is Open</span>
+                  </div>';
+      }
+      else
+      {
+        echo '<div class="alert alert-danger alert-with-icon alert-dismissible fade show" data-notify="container">
+                          <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+                            <i class="nc-icon nc-simple-remove"></i>
+                          </button>
+                          <span data-notify="icon" class="nc-icon nc-bell-55"></span>
+                          <span data-notify="message">Assignment Compilation is Closed!</span>
+                        </div>';
+      }
           ?>
                     <div class="row">
                         
@@ -722,6 +747,7 @@ $class = $cl['cls_id'];
                        <div class="list-group">
                          <h2>Subjects TO Be Accessed</h2>
                        <?php
+                       //list of subject to be acced
                          $sub = $handle->query("select sub_assign.stf_id,sub_assign.sub_id,sub_assign.cls_id,sub_assign.section,
                                subject.sub_id,subject.sub_name,class.cls_id,class.cls_name
                          from sub_assign
